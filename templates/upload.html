@@ -1,15 +1,274 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Contract Security Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #e1e8ed;
+        }
+
+        .container {
+            background: #1e2433;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            border: 1px solid #2d3548;
+        }
+
+        h2 {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #8b95a8;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .upload-area {
+            border: 2px dashed #3d4557;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #252d3d;
+            cursor: pointer;
+            margin-bottom: 24px;
+        }
+
+        .upload-area:hover {
+            border-color: #5468ff;
+            background: #2a3344;
+        }
+
+        .upload-area.drag-over {
+            border-color: #5468ff;
+            background: #2d3749;
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            opacity: 0.6;
+        }
+
+        .upload-text {
+            color: #c5d0de;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            color: #6b7685;
+            font-size: 13px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-info {
+            background: #252d3d;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #3d4557;
+        }
+
+        .file-info.show {
+            display: flex;
+        }
+
+        .file-icon {
+            font-size: 20px;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .file-size {
+            color: #6b7685;
+            font-size: 12px;
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: #8b95a8;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .remove-file:hover {
+            color: #ff5757;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            background: linear-gradient(135deg, #5468ff 0%, #4355db 100%);
+            color: #ffffff;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(84, 104, 255, 0.2);
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(84, 104, 255, 0.3);
+            background: linear-gradient(135deg, #4355db 0%, #3644c2 100%);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        button[type="submit"]:disabled {
+            background: #3d4557;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 28px 20px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .upload-area {
+                padding: 32px 16px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Upload Solidity Smart Contract</h2>
+    <div class="container">
+        <h2>Smart Contract Security Analyzer</h2>
+        <p class="subtitle">Upload your Solidity contract for comprehensive security analysis</p>
 
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="contract" required>
-        <br><br>
-        <button type="submit">Analyze</button>
-    </form>
+        <form method="POST" enctype="multipart/form-data" id="uploadForm">
+            <div class="upload-area" id="uploadArea">
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                <div class="upload-text">Click to upload or drag and drop</div>
+                <div class="upload-hint">Solidity files (.sol) supported</div>
+            </div>
+
+            <input type="file" name="contract" id="fileInput" accept=".sol" required>
+
+            <div class="file-info" id="fileInfo">
+                <span class="file-icon">📄</span>
+                <div class="file-details">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
+                </div>
+                <button type="button" class="remove-file" id="removeFile">✕</button>
+            </div>
+
+            <button type="submit" id="submitBtn" disabled>Analyze Contract</button>
+        </form>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const removeFile = document.getElementById('removeFile');
+        const submitBtn = document.getElementById('submitBtn');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
+        });
+
+        removeFile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.value = '';
+            fileInfo.classList.remove('show');
+            submitBtn.disabled = true;
+        });
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (file) {
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileInfo.classList.add('show');
+                submitBtn.disabled = false;
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+    </script>
 </body>
 </html>

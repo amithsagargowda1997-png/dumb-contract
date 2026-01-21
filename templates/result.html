@@ -1,62 +1,508 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Analysis Result</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Result - Smart Contract Security</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e1e8ed;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: #1e2433;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 1px solid #2d3548;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-content h1 {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header-subtitle {
+            color: #8b95a8;
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #5468ff 0%, #4355db 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(84, 104, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(84, 104, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: #2d3548;
+            color: #c5d0de;
+            border: 1px solid #3d4557;
+        }
+
+        .btn-secondary:hover {
+            background: #353d52;
+        }
+
+        .verdict-card {
+            background: #1e2433;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 1px solid #2d3548;
+        }
+
+        .verdict-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .verdict-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .verdict-icon.safe {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .verdict-icon.warning {
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .verdict-icon.danger {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .verdict-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .verdict-description {
+            color: #8b95a8;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .risk-score {
+            background: #252d3d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #3d4557;
+        }
+
+        .risk-score-label {
+            color: #8b95a8;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .risk-score-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .section-card {
+            background: #1e2433;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+            border: 1px solid #2d3548;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #2d3548;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: #252d3d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .section-count {
+            margin-left: auto;
+            background: #252d3d;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #8b95a8;
+            font-weight: 600;
+        }
+
+        .item-list {
+            list-style: none;
+        }
+
+        .item {
+            background: #252d3d;
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border: 1px solid #3d4557;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item:last-child {
+            margin-bottom: 0;
+        }
+
+        .item-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #5468ff;
+            flex-shrink: 0;
+        }
+
+        .item-text {
+            color: #c5d0de;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .item-tag {
+            margin-left: auto;
+            background: rgba(84, 104, 255, 0.15);
+            color: #7a8cff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 32px;
+            color: #6b7685;
+            font-size: 14px;
+        }
+
+        .empty-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .feature-item {
+            background: #252d3d;
+            border-radius: 6px;
+            padding: 14px;
+            border: 1px solid #3d4557;
+        }
+
+        .feature-label {
+            color: #8b95a8;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .feature-value {
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .ml-prediction {
+            background: #252d3d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #3d4557;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .ml-prediction-label {
+            color: #8b95a8;
+            font-size: 14px;
+        }
+
+        .ml-prediction-badge {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .ml-prediction-badge.anomalous {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ff8a8a;
+        }
+
+        .ml-prediction-badge.normal {
+            background: rgba(16, 185, 129, 0.15);
+            color: #5eead4;
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .header-actions,
+            .btn {
+                display: none !important;
+            }
+
+            .container,
+            .verdict-card,
+            .section-card {
+                background: white;
+                border: 1px solid #ddd;
+                box-shadow: none;
+            }
+
+            .section-card {
+                page-break-inside: avoid;
+            }
+
+            * {
+                color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 24px 20px;
+            }
+
+            .header-content h1 {
+                font-size: 22px;
+            }
+
+            .verdict-card,
+            .section-card {
+                padding: 20px;
+            }
+
+            .feature-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>Security Analysis Report</h1>
+                <div class="header-subtitle">Smart Contract Vulnerability Assessment</div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="window.history.back()">
+                    <span>←</span> Back
+                </button>
+                <button class="btn btn-primary" onclick="window.print()">
+                    <span>🖨️</span> Print Report
+                </button>
+            </div>
+        </div>
 
-<h2>Final Verdict</h2>
-<p><strong>{{ verdict }}</strong> — {{ reason }}</p>
-<p><strong>Risk Score:</strong> {{ risk_score }}</p>
+        <div class="verdict-card">
+            <div class="verdict-header">
+                <div class="verdict-icon {% if 'SAFE' in verdict %}safe{% elif 'WARNING' in verdict %}warning{% else %}danger{% endif %}">
+                    {% if 'SAFE' in verdict %}✓{% elif 'WARNING' in verdict %}⚠️{% else %}⨯{% endif %}
+                </div>
+                <div>
+                    <div class="verdict-title">{{ verdict }}</div>
+                    <div class="verdict-description">{{ reason }}</div>
+                </div>
+            </div>
+            <div class="risk-score">
+                <div class="risk-score-label">Risk Score</div>
+                <div class="risk-score-value">{{ risk_score }}</div>
+            </div>
+        </div>
 
-<hr>
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon">🔗</div>
+                <div class="section-title">External Calls</div>
+                <div class="section-count">{{ external_calls|length }} found</div>
+            </div>
+            {% if external_calls %}
+            <ul class="item-list">
+                {% for c in external_calls %}
+                <li class="item">
+                    <div class="item-bullet"></div>
+                    <div class="item-text">{{ c.function }}</div>
+                    <div class="item-tag">{{ c.call_type }}</div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">✓</div>
+                <div>No external calls detected</div>
+            </div>
+            {% endif %}
+        </div>
 
-<h3>External Calls</h3>
-<ul>
-{% for c in external_calls %}
-    <li>{{ c.function }} → {{ c.call_type }}</li>
-{% else %}
-    <li>None</li>
-{% endfor %}
-</ul>
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon">🔄</div>
+                <div class="section-title">Reentrancy Risks</div>
+                <div class="section-count">{{ reentrancy|length }} found</div>
+            </div>
+            {% if reentrancy %}
+            <ul class="item-list">
+                {% for f in reentrancy %}
+                <li class="item">
+                    <div class="item-bullet"></div>
+                    <div class="item-text">{{ f }}</div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">✓</div>
+                <div>No reentrancy risks identified</div>
+            </div>
+            {% endif %}
+        </div>
 
-<hr>
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon">⚡</div>
+                <div class="section-title">Gas & Loop Risks</div>
+                <div class="section-count">{{ gas_loops|length }} found</div>
+            </div>
+            {% if gas_loops %}
+            <ul class="item-list">
+                {% for g in gas_loops %}
+                <li class="item">
+                    <div class="item-bullet"></div>
+                    <div class="item-text">{{ g.function }}</div>
+                    <div class="item-tag">{{ g.loop_type }}</div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">✓</div>
+                <div>No gas optimization issues found</div>
+            </div>
+            {% endif %}
+        </div>
 
-<h3>Reentrancy Risks</h3>
-<ul>
-{% for f in reentrancy %}
-    <li>{{ f }}</li>
-{% else %}
-    <li>None</li>
-{% endfor %}
-</ul>
-
-<hr>
-
-<h3>Gas / Loop Risks</h3>
-<ul>
-{% for g in gas_loops %}
-    <li>{{ g.function }} ({{ g.loop_type }})</li>
-{% else %}
-    <li>None</li>
-{% endfor %}
-</ul>
-
-<hr>
-
-<h3>ML Feature Vector</h3>
-<ul>
-{% for k, v in features.items() %}
-    <li>{{ k }} : {{ v }}</li>
-{% endfor %}
-</ul>
-<p><strong>Isolation Forest Prediction:</strong>
-{% if iforest_prediction == -1 %}
-    Anomalous
-{% else %}
-    Normal
-{% endif %}
-</p>
-
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-icon">🤖</div>
+                <div class="section-title">ML Analysis</div>
+            </div>
+            <div class="feature-grid">
+                {% for k, v in features.items() %}
+                <div class="feature-item">
+                    <div class="feature-label">{{ k }}</div>
+                    <div class="feature-value">{{ v }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="ml-prediction">
+                <div class="ml-prediction-label">Isolation Forest Prediction:</div>
+                <div class="ml-prediction-badge {% if iforest_prediction == -1 %}anomalous{% else %}normal{% endif %}">
+                    {% if iforest_prediction == -1 %}Anomalous{% else %}Normal{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
