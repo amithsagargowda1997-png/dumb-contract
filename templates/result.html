@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analysis Result</title>
+</head>
+<body>
+
+<h2>Final Verdict</h2>
+<p><strong>{{ verdict }}</strong> — {{ reason }}</p>
+<p><strong>Risk Score:</strong> {{ risk_score }}</p>
+
+<hr>
+
+<h3>External Calls</h3>
+<ul>
+{% for c in external_calls %}
+    <li>{{ c.function }} → {{ c.call_type }}</li>
+{% else %}
+    <li>None</li>
+{% endfor %}
+</ul>
+
+<hr>
+
+<h3>Reentrancy Risks</h3>
+<ul>
+{% for f in reentrancy %}
+    <li>{{ f }}</li>
+{% else %}
+    <li>None</li>
+{% endfor %}
+</ul>
+
+<hr>
+
+<h3>Gas / Loop Risks</h3>
+<ul>
+{% for g in gas_loops %}
+    <li>{{ g.function }} ({{ g.loop_type }})</li>
+{% else %}
+    <li>None</li>
+{% endfor %}
+</ul>
+
+<hr>
+
+<h3>ML Feature Vector</h3>
+<ul>
+{% for k, v in features.items() %}
+    <li>{{ k }} : {{ v }}</li>
+{% endfor %}
+</ul>
+<p><strong>Isolation Forest Prediction:</strong>
+{% if iforest_prediction == -1 %}
+    Anomalous
+{% else %}
+    Normal
+{% endif %}
+</p>
+
+</body>
+</html>

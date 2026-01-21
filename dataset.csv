@@ -1,0 +1,9 @@
+num_functions,num_public_functions,num_external_calls,num_reentrancy_flags,num_loops,num_loops_with_external_calls,risk_score
+1,1,1,1,1,1,105
+2,2,1,1,0,0,60
+2,1,1,1,0,0,60
+2,1,1,1,0,0,60
+1,1,1,1,0,0,60
+3,3,1,1,0,0,60
+2,2,1,1,1,1,105
+2,2,1,1,0,0,60
